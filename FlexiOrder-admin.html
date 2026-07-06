@@ -352,12 +352,52 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           </div>
         </div>
 
-        <!-- Venue info -->
+        <!-- Venue settings -->
         <div class="scard">
-          <div class="scard-hdr"><span class="scard-icon">ℹ️</span><div><div class="scard-title">Venue Info</div></div></div>
-          <div class="scard-body" style="display:flex;flex-direction:column;gap:8px;">
-            <div class="info-pill">Location <strong>Makindye, Kampala 🇺🇬</strong></div>
-            <div class="info-pill">Management <strong>Orders and stock</strong></div>
+          <div class="scard-hdr"><span class="scard-icon">ℹ️</span>
+            <div><div class="scard-title">Venue Settings</div>
+            <div class="scard-sub">Updates the customer-facing site name, theme color, and check-in geofence.</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="sf-row"><label class="sf-label">Venue Name</label><input class="sf-input" type="text" id="venueName" placeholder="Climax Lounge Makindye"/></div>
+            <div class="sf-row"><label class="sf-label">Theme Color</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <input type="color" id="venueThemeColor" value="#d4a017" style="width:44px;height:36px;border:1px solid rgba(255,255,255,.15);border-radius:4px;background:none;padding:0;cursor:pointer;">
+                <input class="sf-input" type="text" id="venueThemeColorText" placeholder="#d4a017" style="flex:1;">
+              </div>
+            </div>
+            <div class="sf-row"><label class="sf-label">Logo URL <span style="opacity:.6;font-weight:400;">(optional)</span></label><input class="sf-input" type="text" id="venueLogoUrl" placeholder="https://…"/></div>
+            <div class="sf-row" style="display:flex;gap:10px;">
+              <div style="flex:1;"><label class="sf-label">Venue Latitude</label><input class="sf-input" type="text" id="venueLat" placeholder="0.3010"/></div>
+              <div style="flex:1;"><label class="sf-label">Venue Longitude</label><input class="sf-input" type="text" id="venueLng" placeholder="32.5900"/></div>
+            </div>
+            <div class="sf-row">
+              <button class="sf-btn" type="button" onclick="useCurrentLocationForVenue()" style="background:none;border:1px solid rgba(255,255,255,.15);color:var(--lime,#a8ff3e);"><span>📍 Use My Current Location</span></button>
+            </div>
+            <div class="sf-row"><label class="sf-label">Check-In Radius (meters)</label><input class="sf-input" type="number" id="venueRadius" min="10" max="5000" placeholder="150"/>
+              <div style="font-size:.72rem;opacity:.6;margin-top:4px;">Customers must be within this distance of the venue location to check in and order. Applies to all tables.</div>
+            </div>
+            <button class="sf-btn" onclick="saveVenueSettings()"><span>Save Venue Settings →</span></button>
+            <div class="sf-msg" id="venueMsg"></div>
+          </div>
+        </div>
+
+        <!-- Table manager -->
+        <div class="scard">
+          <div class="scard-hdr"><span class="scard-icon">🪑</span>
+            <div><div class="scard-title">Table Manager</div>
+            <div class="scard-sub">Add or remove tables. Active tables appear on the customer Table Selection screen.</div></div>
+          </div>
+          <div class="scard-body">
+            <div class="sf-row" style="display:flex;gap:10px;">
+              <div style="flex:1;"><label class="sf-label">Table Name / Number</label><input class="sf-input" type="text" id="newTableName" placeholder="e.g. 12 or VIP-1"/></div>
+              <div style="width:120px;"><label class="sf-label">Sort #</label><input class="sf-input" type="number" id="newTableNum" placeholder="12"/></div>
+            </div>
+            <button class="sf-btn" onclick="addTable()"><span>+ Add Table →</span></button>
+            <div class="sf-msg" id="tableMsg"></div>
+            <div id="tableManagerList" style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+              <div style="opacity:.6;font-size:.8rem;">Loading tables…</div>
+            </div>
           </div>
         </div>
 
@@ -676,6 +716,163 @@ function renderSettingsData(){
   if(urlInput) urlInput.value = getApiUrl();
   const cur = document.getElementById('currentApiUrl');
   if(cur) cur.textContent = getApiUrl();
+  fetchVenueSettings();
+  fetchTablesForManager();
+}
+
+// ════════════════════════════════════════
+// VENUE SETTINGS
+// ════════════════════════════════════════
+async function fetchVenueSettings(){
+  try{
+    const res = await fetch(getApiUrl()+'/api/venue', { headers:{'X-API-Key':API_KEY} });
+    if(!res.ok) return;
+    const v = await res.json();
+    if(!v || !v.id) return;
+    document.getElementById('venueName').value          = v.name || '';
+    document.getElementById('venueThemeColor').value     = v.theme_color || '#d4a017';
+    document.getElementById('venueThemeColorText').value = v.theme_color || '#d4a017';
+    document.getElementById('venueLogoUrl').value        = v.logo_url || '';
+    document.getElementById('venueLat').value            = v.lat ?? '';
+    document.getElementById('venueLng').value             = v.lng ?? '';
+    document.getElementById('venueRadius').value         = v.geofence_radius_m ?? 150;
+  }catch(e){ console.error('fetchVenueSettings failed', e); }
+}
+
+// Keep the color swatch and hex text field in sync with each other.
+document.addEventListener('DOMContentLoaded', () => {
+  const swatch = document.getElementById('venueThemeColor');
+  const text    = document.getElementById('venueThemeColorText');
+  if(swatch && text){
+    swatch.addEventListener('input', () => text.value = swatch.value);
+    text.addEventListener('input', () => {
+      if(/^#[0-9A-Fa-f]{6}$/.test(text.value)) swatch.value = text.value;
+    });
+  }
+});
+
+function useCurrentLocationForVenue(){
+  if(!navigator.geolocation){
+    showMsg('venueMsg', 'Geolocation is not available in this browser.', 'err');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      document.getElementById('venueLat').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('venueLng').value = pos.coords.longitude.toFixed(6);
+      showMsg('venueMsg', 'Location captured. Review and save.', 'ok');
+    },
+    () => showMsg('venueMsg', 'Could not get your location. Check browser permissions.', 'err')
+  );
+}
+
+async function saveVenueSettings(){
+  const name        = document.getElementById('venueName').value.trim();
+  const themeColor  = document.getElementById('venueThemeColorText').value.trim();
+  const logoUrl     = document.getElementById('venueLogoUrl').value.trim();
+  const latRaw      = document.getElementById('venueLat').value.trim();
+  const lngRaw      = document.getElementById('venueLng').value.trim();
+  const radiusRaw   = document.getElementById('venueRadius').value.trim();
+
+  if(themeColor && !/^#[0-9A-Fa-f]{6}$/.test(themeColor)){
+    showMsg('venueMsg', 'Theme color must be a hex code like #d4a017.', 'err');
+    return;
+  }
+
+  const payload = { name, theme_color: themeColor || undefined, logo_url: logoUrl };
+  if(latRaw !== '')    payload.lat = parseFloat(latRaw);
+  if(lngRaw !== '')    payload.lng = parseFloat(lngRaw);
+  if(radiusRaw !== '') payload.geofence_radius_m = parseInt(radiusRaw, 10);
+
+  try{
+    const res = await fetch(getApiUrl()+'/api/venue', {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','X-API-Key':API_KEY},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(res.ok && data.success){
+      showMsg('venueMsg', 'Venue settings saved. The customer site will pick this up on next load.', 'ok');
+    } else {
+      showMsg('venueMsg', data.error || 'Could not save venue settings.', 'err');
+    }
+  }catch(e){
+    showMsg('venueMsg', 'Network error saving venue settings.', 'err');
+  }
+}
+
+// ════════════════════════════════════════
+// TABLE MANAGER
+// ════════════════════════════════════════
+async function fetchTablesForManager(){
+  const wrap = document.getElementById('tableManagerList');
+  try{
+    const res = await fetch(getApiUrl()+'/api/tables?all=1', { headers:{'X-API-Key':API_KEY} });
+    const list = await res.json();
+    if(!Array.isArray(list) || !list.length){
+      wrap.innerHTML = `<div style="opacity:.6;font-size:.8rem;">No tables yet. Add one above.</div>`;
+      return;
+    }
+    wrap.innerHTML = list.map(t => `
+      <div class="info-pill" style="display:flex;align-items:center;justify-content:space-between;gap:10px;${t.active?'':'opacity:.5;'}">
+        <span>${escapeHtml(t.name||'')} ${t.table_num!=null?`<span style="opacity:.6;">#${t.table_num}</span>`:''} ${t.active?'':'<span style=\"color:var(--rose,#ff6767);\">(hidden)</span>'}</span>
+        <span style="display:flex;gap:8px;">
+          <button class="abtn" style="padding:4px 10px;" onclick="toggleTableActive('${t.id}', ${!t.active})">${t.active?'Hide':'Show'}</button>
+          <button class="abtn del" style="padding:4px 10px;" onclick="removeTable('${t.id}')">✕</button>
+        </span>
+      </div>`).join('');
+  }catch(e){
+    wrap.innerHTML = `<div style="opacity:.6;font-size:.8rem;">Could not load tables.</div>`;
+  }
+}
+
+async function addTable(){
+  const name    = document.getElementById('newTableName').value.trim();
+  const numRaw  = document.getElementById('newTableNum').value.trim();
+  if(!name){
+    showMsg('tableMsg', 'Table name is required.', 'err');
+    return;
+  }
+  const payload = { name };
+  if(numRaw !== '') payload.table_num = parseInt(numRaw, 10);
+
+  try{
+    const res = await fetch(getApiUrl()+'/api/tables', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-API-Key':API_KEY},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(res.ok && data.success){
+      document.getElementById('newTableName').value = '';
+      document.getElementById('newTableNum').value  = '';
+      showMsg('tableMsg', 'Table added.', 'ok');
+      fetchTablesForManager();
+    } else {
+      showMsg('tableMsg', data.error || 'Could not add table.', 'err');
+    }
+  }catch(e){
+    showMsg('tableMsg', 'Network error adding table.', 'err');
+  }
+}
+
+async function toggleTableActive(id, nextActive){
+  try{
+    await fetch(getApiUrl()+'/api/tables/'+id, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','X-API-Key':API_KEY},
+      body: JSON.stringify({ active: nextActive })
+    });
+    fetchTablesForManager();
+  }catch(e){ showMsg('tableMsg', 'Could not update table.', 'err'); }
+}
+
+async function removeTable(id){
+  if(!confirm('Remove this table? It will disappear from the customer Table Selection screen.')) return;
+  try{
+    await fetch(getApiUrl()+'/api/tables/'+id, { method:'DELETE', headers:{'X-API-Key':API_KEY} });
+    fetchTablesForManager();
+  }catch(e){ showMsg('tableMsg', 'Could not remove table.', 'err'); }
 }
 
 function renderStock(){
