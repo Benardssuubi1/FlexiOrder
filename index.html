@@ -178,6 +178,7 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
 }
 .tp-confirm span{position:relative;z-index:1;}
 .tp-confirm.ready{opacity:1;pointer-events:all;}
+.tp-confirm.checking{opacity:.65;pointer-events:none;cursor:wait;}
 .tp-confirm.ready:hover::before{transform:translateX(0);}
 .tp-confirm.ready:hover{color:var(--void);box-shadow:var(--glow-c);}
 
@@ -1085,17 +1086,26 @@ let activeCat = 'cocktails';
 // ═══════════════════════════════════════
 // TABLE PICKER
 // ═══════════════════════════════════════
-(function buildGrid(){
+// Renders the table grid from live data (fetched from /api/tables).
+// Falls back to a static 1–20 grid if the API is unreachable, so the
+// page still works if the backend or table data isn't available yet.
+function buildGrid(tableList){
   const g = document.getElementById('tableGrid');
-  for(let i = 1; i <= 20; i++){
+  g.innerHTML = '';
+  const list = (Array.isArray(tableList) && tableList.length)
+    ? tableList
+    : Array.from({length:20}, (_,i) => ({ table_num: i+1, name: String(i+1) }));
+
+  list.forEach(t => {
+    const num = t.table_num != null ? t.table_num : t.name;
     const b = document.createElement('button');
     b.className = 'tbl-btn';
-    b.textContent = i;
-    b.dataset.num = i;
-    b.onclick = () => pickTable(i, b);
+    b.textContent = t.name || num;
+    b.dataset.num = num;
+    b.onclick = () => pickTable(num, b);
     g.appendChild(b);
-  }
-})();
+  });
+}
 
 function pickTable(num, btn){
   document.querySelectorAll('.tbl-btn').forEach(b => b.classList.remove('sel'));
@@ -1107,9 +1117,26 @@ function pickTable(num, btn){
   cb.classList.add('ready');
 }
 
-function confirmTable(event, targetId='menu'){
+async function confirmTable(event, targetId='menu'){
   if(!selectedTable) return false;
   if(event) event.preventDefault();
+
+  const cb = document.getElementById('confirmBtn');
+  const originalLabel = cb.querySelector('span').textContent;
+  cb.classList.add('checking');
+  cb.querySelector('span').textContent = 'Checking your location…';
+
+  const geo = await checkGeofence();
+
+  if(!geo.ok){
+    cb.classList.remove('checking');
+    cb.querySelector('span').textContent = originalLabel;
+    toast(geo.reason || "Couldn't verify your location.");
+    return false;
+  }
+  cb.classList.remove('checking');
+  cb.querySelector('span').textContent = originalLabel;
+
   document.getElementById('ribbonText').textContent    = `Ordering for Table ${selectedTable}`;
   document.getElementById('drawerTableTag').textContent = `Table ${selectedTable}`;
   document.getElementById('sTableTxt').textContent      = `Table ${selectedTable}`;
@@ -1277,6 +1304,98 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
 const APP_CONFIG = window.CLIMAX_CONFIG || {};
 const API_URL = (APP_CONFIG.API_URL || '').replace(/\/$/, '');
 const API_KEY = APP_CONFIG.API_KEY || '';
+
+// ═══════════════════════════════════════
+// GEOFENCING — Haversine distance check
+// ═══════════════════════════════════════
+let venueInfo = null; // populated from /api/venue: { lat, lng, geofence_radius_m, name, theme_color, logo_url }
+
+// Distance in meters between two lat/lng points.
+function haversineMeters(lat1, lng1, lat2, lng2){
+  const R = 6371000; // Earth radius, meters
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+// Resolves { ok: true } if within range (or geofence not configured),
+// or { ok: false, reason } if the browser blocks location or the
+// customer is too far from the venue.
+function checkGeofence(){
+  return new Promise(resolve => {
+    if(!venueInfo || venueInfo.lat == null || venueInfo.lng == null){
+      resolve({ ok: true }); // no geofence configured yet — don't block anyone
+      return;
+    }
+    if(!navigator.geolocation){
+      resolve({ ok: false, reason: 'Your browser does not support location check-in. Please ask a staff member.' });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const dist = haversineMeters(
+          pos.coords.latitude, pos.coords.longitude,
+          venueInfo.lat, venueInfo.lng
+        );
+        const radius = venueInfo.geofence_radius_m || 150;
+        if(dist <= radius){
+          resolve({ ok: true });
+        } else {
+          resolve({ ok: false, reason: `You're too far from the venue to check in (about ${Math.round(dist)}m away). Please move closer, or ask a staff member for help.` });
+        }
+      },
+      () => resolve({ ok: false, reason: 'Please allow location access to check in at your table.' }),
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+    );
+  });
+}
+
+// Applies venue name/theme color to the customer-facing UI.
+function applyVenueTheme(v){
+  if(!v) return;
+  if(v.name){
+    document.querySelectorAll('.tp-logo, .nav-logo, .f-logo').forEach(el => el.textContent = v.name.toUpperCase());
+    document.title = v.name + ' — Smart Bar Service';
+  }
+  if(v.theme_color){
+    document.documentElement.style.setProperty('--lime', v.theme_color);
+  }
+}
+
+// Fetches venue settings + active tables, then builds the picker.
+async function loadVenueAndTables(){
+  if(!API_URL || !API_KEY){
+    buildGrid(null); // fall back to static 1–20 grid
+    return;
+  }
+  try{
+    const [venueRes, tablesRes] = await Promise.all([
+      fetch(API_URL + '/api/venue',  { headers: { 'X-API-Key': API_KEY } }),
+      fetch(API_URL + '/api/tables', { headers: { 'X-API-Key': API_KEY } })
+    ]);
+    venueInfo = venueRes.ok ? await venueRes.json() : null;
+    applyVenueTheme(venueInfo);
+    const tables = tablesRes.ok ? await tablesRes.json() : null;
+    buildGrid(tables);
+  }catch(e){
+    console.error('Could not load venue/tables', e);
+    buildGrid(null);
+  }
+  preselectTableFromUrl();
+}
+
+// Pre-selects a table if ?table=N is present in the URL, once the grid exists.
+function preselectTableFromUrl(){
+  const params = new URLSearchParams(window.location.search);
+  const table = params.get('table');
+  if(!table) return;
+  const btn = Array.from(document.querySelectorAll('.tbl-btn')).find(b => String(b.dataset.num) === String(table));
+  if(btn) pickTable(btn.dataset.num, btn);
+}
 
 const PAYMENT_METHODS = [
   {
@@ -1494,14 +1613,7 @@ function toast(msg){
   setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-window.addEventListener('load', () => {
-  const params = new URLSearchParams(window.location.search);
-  const table = parseInt(params.get('table') || '', 10);
-  if(table >= 1 && table <= 20){
-    const btn = Array.from(document.querySelectorAll('.tbl-btn')).find(b => Number(b.textContent) === table);
-    if(btn) pickTable(table, btn);
-  }
-});
+loadVenueAndTables();
 </script>
 </body>
 </html>
