@@ -408,20 +408,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
 <div class="notif" id="notif"><div class="notif-t" id="notifT"></div><div class="notif-b" id="notifB"></div></div>
 
-<script>
-    // 1. MUST be the first lines to ensure they are available for the rest of your app
-    window.ENV_API_KEY = "PLACEHOLDER_FOR_API_KEY"; 
-    const API_URL = "https://flexiorder-api.onrender.com";
-    const API_KEY = window.ENV_API_KEY;
-
-    // 2. Now your existing dashboard logic follows immediately after
-    function fetchOrders() {
-        console.log("Connecting to:", API_URL);
-        // Your fetch() logic that uses API_KEY...
-    }
-    
-    fetchOrders(); // Example call
-</script>
 <script src="./climax-config.js"></script>
 <script>
 // ════════════════════════════════════════
