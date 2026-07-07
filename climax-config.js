@@ -1,4 +1,6 @@
 window.CLIMAX_CONFIG = {
-  API_URL: 'https://climax-api-production.up.railway.app',
-  API_KEY: 'climax-secret-2025'
+  // URL is safe to be here as it's public
+  API_URL: 'https://flexiorder-api.onrender.com',
+
+  API_KEY: window.ENV_API_KEY || null 
 };
