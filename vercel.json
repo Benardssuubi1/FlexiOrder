@@ -1,9 +1,8 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/climax-index.html" },
-    { "source": "/admin", "destination": "/climax-admin.html" },
-    { "source": "/management", "destination": "/climax-admin.html" },
-    { "source": "/attendant", "destination": "/climax-attendant.html" },
-    { "source": "/protected/admin/settings", "destination": "/climax-admin.html" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/Admin.html" },
+    { "source": "/attendant", "destination": "/FlexiOrder-attendant.html" },
+    { "source": "/protected/admin/settings", "destination": "/Admin.html" }
   ]
 }
