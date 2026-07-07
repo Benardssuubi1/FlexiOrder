@@ -370,14 +370,17 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="notif" id="notif"><div class="notif-t" id="notifT"></div><div class="notif-b" id="notifB"></div></div>
 
 <script src="./climax-config.js"></script>
+<script src="./main-dashboard-logic.js"></script>
 <script>
 // ════════════════════════════════════════
 // API URL — saved in localStorage so you
 // can change it from the Settings tab
 // ════════════════════════════════════════
-const APP_CONFIG = window.CLIMAX_CONFIG || {};
-const DEFAULT_API = (APP_CONFIG.API_URL || '').replace(/\/$/, '');
-const API_KEY = APP_CONFIG.API_KEY || '';
+// At the top of your logic file
+const config = window.CLIMAX_CONFIG || {};
+const API_URL = config.API_URL;
+const API_KEY = config.API_KEY;
+
 
 function getApiUrl(){
   return localStorage.getItem('climax_api_url') || DEFAULT_API;
