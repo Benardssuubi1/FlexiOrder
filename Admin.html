@@ -419,7 +419,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 const config = window.CLIMAX_CONFIG || {};
 const API_URL = config.API_URL;
 const API_KEY = config.API_KEY;
-
+const DEFAULT_API = API_URL;
 
 function getApiUrl(){
   return localStorage.getItem('climax_api_url') || DEFAULT_API;
