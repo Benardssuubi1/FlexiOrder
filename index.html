@@ -1005,6 +1005,7 @@ section{position:relative;z-index:1;}
 <div class="toast" id="toast"></div>
 
 <script src="./climax-config.js"></script>
+<script src="./main-dashboard-logic.js"></script>
 <script>
 // ═══════════════════════════════════════
 // INJECT HERO IMAGE (base64 embedded)
@@ -1301,9 +1302,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
 // ═══════════════════════════════════════
 // API CONFIG
 // ═══════════════════════════════════════
-const APP_CONFIG = window.CLIMAX_CONFIG || {};
-const API_URL = (APP_CONFIG.API_URL || '').replace(/\/$/, '');
-const API_KEY = APP_CONFIG.API_KEY || '';
+// At the top of your logic file
+const config = window.CLIMAX_CONFIG || {};
+const API_URL = config.API_URL;
+const API_KEY = config.API_KEY;
 
 // ═══════════════════════════════════════
 // GEOFENCING — Haversine distance check
