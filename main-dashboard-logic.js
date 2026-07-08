@@ -31,3 +31,23 @@ async function fetchData() {
         console.error("Connection failed:", error);
     }
 }
+
+async function sendOrder(orderData) {
+    const config = window.CLIMAX_CONFIG;
+    
+    try {
+        const response = await fetch(`${config.API_URL}/orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': config.API_KEY
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        if (!response.ok) throw new Error("Failed to send order");
+        alert("Order Sent Successfully!");
+    } catch (error) {
+        console.error("Order Error:", error);
+    }
+}
