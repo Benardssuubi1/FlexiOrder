@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/Admin.html" },
+    { "source": "/attendant", "destination": "/FlexiOrder-attendant.html" },
+    { "source": "/protected/admin/settings", "destination": "/Admin.html" }
+  ]
+}
