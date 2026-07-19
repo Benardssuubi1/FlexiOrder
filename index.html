@@ -1032,13 +1032,22 @@ section{position:relative;z-index:1;}
 // CONFIG
 // ═══════════════════════════════════════
 const CFG = window.CLIMAX_CONFIG || {};
-const API_BASE = (CFG.API_URL || '').replace(/\/$/, '');
-const API_KEY  = CFG.API_KEY || '';
+const API_BASE = (CFG.API_URL || 'https://flexiorder-api.onrender.com').replace(/\/$/, '');
+const API_KEY  = CFG.API_KEY || '@6Foodies';
+// For compatibility with existing code
+const API_URL = API_BASE; 
 
 // Debug: Log configuration
-console.log('Configuration loaded:', { API_BASE, API_KEY, CFG });
-if(!API_BASE) console.error('API_BASE is empty - check climax-config.js');
-if(!API_KEY) console.error('API_KEY is empty - check climax-config.js');
+console.log('=== FlexiOrder Configuration ===');
+console.log('API Base URL:', API_BASE);
+console.log('API Key:', API_KEY ? 'present' : 'missing');
+console.log('Full Config:', CFG);
+console.log('==================================');
+
+// Alert if config not loaded properly
+if(!CFG.API_URL) {
+  console.warn('Using default cloud API URL. Check climax-config.js for custom configuration.');
+}
 
 // ═══════════════════════════════════════
 // STATE
@@ -1071,7 +1080,8 @@ async function loadTables(){
   const grid = document.getElementById('tableGrid');
   grid.innerHTML = '<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1;text-align:center;">Loading tables…</div>';
   
-  console.log('Attempting to load tables from:', API_BASE+'/api/tables');
+  console.log('=== Loading Tables ===');
+  console.log('API Endpoint:', API_BASE+'/api/tables');
   console.log('API Key:', API_KEY ? 'present' : 'missing');
   
   try{
@@ -1079,35 +1089,44 @@ async function loadTables(){
       headers:{'X-API-Key':API_KEY}
     });
     
-    console.log('Response status:', res.status, res.statusText);
+    console.log('Response Status:', res.status, res.statusText);
     
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res.ok) {
+      const errorText = await res.text();
+      console.error('API Error Response:', errorText);
+      throw new Error(`HTTP ${res.status}: ${errorText}`);
+    }
     
     const tables = await res.json();
-    console.log('Tables response:', tables);
+    console.log('Tables loaded successfully:', tables.length, 'tables');
+    console.log('Sample table:', tables[0]);
     
     if(!Array.isArray(tables)||!tables.length){
-      console.log('No tables found in response');
-      grid.innerHTML='<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1;text-align:center;">No tables configured. Ask staff.</div>';
+      console.log('No tables in response - using fallback');
+      grid.innerHTML='<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1;text-align:center;">No tables configured. Using numbered tables.</div>';
+      // Still use fallback to ensure system works
+      grid.innerHTML = Array.from({length:20},(_,i)=>`
+        <button class="tbl-btn" data-id="t${i+1}" data-name="${i+1}" data-num="${i+1}" onclick="selectTable(this)">${i+1}</button>
+      `).join('');
       return;
     }
     
     grid.innerHTML = tables.map(t=>`
       <button class="tbl-btn" data-id="${esc(t.id)}" data-name="${esc(t.name)}" data-num="${t.table_num||0}" onclick="selectTable(this)">${esc(t.name)}</button>
     `).join('');
-    console.log('Successfully loaded', tables.length, 'tables from API');
+    console.log('✓ Successfully rendered', tables.length, 'tables');
   }catch(e){
-    console.error('Failed to load tables from API:', e);
+    console.error('✗ Failed to load tables:', e);
     console.error('Error details:', e.message);
-    console.log('API_BASE:', API_BASE);
-    console.log('Using fallback numbered tables');
+    console.log('Falling back to numbered tables 1-20');
     
     // Fallback: numbered grid 1-20 (ensures the system always works)
     grid.innerHTML = Array.from({length:20},(_,i)=>`
       <button class="tbl-btn" data-id="t${i+1}" data-name="${i+1}" data-num="${i+1}" onclick="selectTable(this)">${i+1}</button>
     `).join('');
-    toast('Using offline table selection - Check console for errors', 5000);
+    toast('Could not load tables from cloud - using numbered tables', 5000);
   }
+  console.log('=== Table Loading Complete ===');
 }
 
 function selectTable(btn){
@@ -1469,9 +1488,12 @@ function initFadeUp(){
 // BOOT
 // ═══════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
+  console.log('=== Page Loaded ===');
+  console.log('Initializing FlexiOrder...');
   loadTables();
   buildSchedule();
   initFadeUp();
+  console.log('=== Initialization Complete ===');
 });
 
 // ═══════════════════════════════════════
@@ -1837,24 +1859,42 @@ function applyVenueTheme(v){
 
 // Fetches venue settings + active tables, then builds the picker.
 async function loadVenueAndTables(){
-  if(!API_URL || !API_KEY){
+  console.log('=== Loading Venue and Tables ===');
+  console.log('API Base:', API_BASE);
+  console.log('API Key:', API_KEY ? 'present' : 'missing');
+  
+  if(!API_BASE || !API_KEY){
+    console.log('Missing API config, using fallback tables');
     buildGrid(null); // fall back to static 1–20 grid
     return;
   }
   try{
     const [venueRes, tablesRes] = await Promise.all([
-      fetch(API_URL + '/api/venue',  { headers: { 'X-API-Key': API_KEY } }),
-      fetch(API_URL + '/api/tables', { headers: { 'X-API-Key': API_KEY } })
+      fetch(API_BASE + '/api/venue',  { headers: { 'X-API-Key': API_KEY } }),
+      fetch(API_BASE + '/api/tables', { headers: { 'X-API-Key': API_KEY } })
     ]);
+    
+    console.log('Venue response status:', venueRes.status);
+    console.log('Tables response status:', tablesRes.status);
+    
     venueInfo = venueRes.ok ? await venueRes.json() : null;
     applyVenueTheme(venueInfo);
     const tables = tablesRes.ok ? await tablesRes.json() : null;
+    
+    if(tables && Array.isArray(tables)){
+      console.log('✓ Loaded', tables.length, 'tables from API');
+    } else {
+      console.log('No tables from API, using fallback');
+    }
+    
     buildGrid(tables);
   }catch(e){
-    console.error('Could not load venue/tables', e);
+    console.error('✗ Could not load venue/tables:', e);
+    console.log('Using fallback tables');
     buildGrid(null);
   }
   preselectTableFromUrl();
+  console.log('=== Venue and Tables Loading Complete ===');
 }
 
 // Pre-selects a table if ?table=N is present in the URL, once the grid exists.
