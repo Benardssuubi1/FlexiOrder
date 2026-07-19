@@ -1452,7 +1452,9 @@ function start(){
     cd--;
     const el=document.getElementById('countdown');
     if(el) el.textContent=cd;
-    if(cd<=0){ await fetchOrders(); cd=8; }
+    // Only refresh orders if we're on the orders tab to avoid interfering with settings
+    if(cd<=0 && currentTab==='orders'){ await fetchOrders(); cd=8; }
+    else if(cd<=0){ cd=8; } // Reset countdown even if not refreshing
   },1000);
 }
 if(sessionStorage.getItem(AUTH_KEY)==='1') start();
