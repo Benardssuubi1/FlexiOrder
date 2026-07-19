@@ -549,6 +549,27 @@ section{position:relative;z-index:1;}
   font-family:'Share Tech Mono',monospace;padding:0 4px;
   box-shadow:0 0 10px rgba(168,255,62,.5);
 }
+.cf-preview{
+  position:absolute;bottom:-8px;left:-8px;background:var(--void2);
+  border:1px solid var(--border);border-radius:4px;padding:8px;
+  min-width:140px;max-width:200px;display:none;box-shadow:0 4px 12px rgba(0,0,0,.4);
+  font-size:.65rem;color:var(--text);z-index:81;
+}
+.cf-preview.show{display:block;}
+.cf-preview-item{
+  display:flex;align-items:center;gap:6px;padding:3px 0;
+  border-bottom:1px solid var(--border2);
+}
+.cf-preview-item:last-child{border-bottom:none;}
+.cf-preview-qty{
+  background:var(--cyan);color:var(--void);width:18px;height:18px;
+  border-radius:3px;display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:700;
+}
+.cf-preview-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cf-preview-total{
+  font-family:'Share Tech Mono',monospace;color:var(--lime);
+}
 
 /* ═══════════════════════════
    ORDER DRAWER
@@ -924,6 +945,7 @@ section{position:relative;z-index:1;}
 <!-- Floating cart -->
 <button class="cart-float" id="cartFloat" onclick="openDrawer()">
   🛒<div class="cf-badge" id="cfBadge"></div>
+  <div class="cf-preview" id="cfPreview"></div>
 </button>
 
 <!-- Order drawer -->
@@ -1031,8 +1053,8 @@ function toast(msg,ms=2800){
   setTimeout(()=>t.classList.remove('show'),ms);
 }
 
-// Categories that support cold/warm preference
-const TEMP_CATS = ['Beers & Ciders','Soft Drinks','Cocktails','Mocktails','Juices','Water'];
+// Categories that support cold/warm preference (restricted to soft drinks and beers only)
+const TEMP_CATS = ['Beers & Ciders','Soft Drinks'];
 function cartHasTempItems(){
   return Object.values(cart).some(({item})=>TEMP_CATS.includes(item.category));
 }
@@ -1054,11 +1076,15 @@ async function loadTables(){
     grid.innerHTML = tables.map(t=>`
       <button class="tbl-btn" data-id="${esc(t.id)}" data-name="${esc(t.name)}" data-num="${t.table_num||0}" onclick="selectTable(this)">${esc(t.name)}</button>
     `).join('');
+    console.log('Loaded', tables.length, 'tables from API');
   }catch(e){
-    // Fallback: numbered grid 1-20
+    console.error('Failed to load tables from API:', e);
+    console.log('Using fallback numbered tables');
+    // Fallback: numbered grid 1-20 (ensures the system always works)
     grid.innerHTML = Array.from({length:20},(_,i)=>`
       <button class="tbl-btn" data-id="t${i+1}" data-name="${i+1}" data-num="${i+1}" onclick="selectTable(this)">${i+1}</button>
     `).join('');
+    toast('Using offline table selection', 3000);
   }
 }
 
@@ -1176,13 +1202,25 @@ function updateCartUI(){
   const count = Object.values(cart).reduce((s,{qty})=>s+qty,0);
   const float = document.getElementById('cartFloat');
   const badge = document.getElementById('cfBadge');
+  const preview = document.getElementById('cfPreview');
   if(count>0){
     float.classList.add('show');
     badge.style.display='flex';
     badge.textContent=count;
+    // Show cart preview
+    const items = Object.values(cart);
+    preview.innerHTML = items.slice(0,3).map(({item,qty})=>`
+      <div class="cf-preview-item">
+        <div class="cf-preview-qty">${qty}</div>
+        <div class="cf-preview-name">${esc(item.name)}</div>
+        <div class="cf-preview-total">UGX ${(item.price*qty).toLocaleString()}</div>
+      </div>
+    `).join('') + (items.length>3 ? `<div style="text-align:center;padding:4px 0;color:var(--muted);font-size:.6rem;">+${items.length-3} more</div>` : '');
+    preview.classList.add('show');
   } else {
     float.classList.remove('show');
     badge.style.display='none';
+    preview.classList.remove('show');
   }
   document.getElementById('drawerTotal').textContent = 'UGX '+total.toLocaleString();
   renderDrawerItems();
