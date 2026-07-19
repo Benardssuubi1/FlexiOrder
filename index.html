@@ -1035,6 +1035,11 @@ const CFG = window.CLIMAX_CONFIG || {};
 const API_BASE = (CFG.API_URL || '').replace(/\/$/, '');
 const API_KEY  = CFG.API_KEY || '';
 
+// Debug: Log configuration
+console.log('Configuration loaded:', { API_BASE, API_KEY, CFG });
+if(!API_BASE) console.error('API_BASE is empty - check climax-config.js');
+if(!API_KEY) console.error('API_KEY is empty - check climax-config.js');
+
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
@@ -1065,26 +1070,43 @@ function cartHasTempItems(){
 async function loadTables(){
   const grid = document.getElementById('tableGrid');
   grid.innerHTML = '<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1;text-align:center;">Loading tables…</div>';
+  
+  console.log('Attempting to load tables from:', API_BASE+'/api/tables');
+  console.log('API Key:', API_KEY ? 'present' : 'missing');
+  
   try{
-    const res = await fetch(API_BASE+'/api/tables',{headers:{'X-API-Key':API_KEY}});
+    const res = await fetch(API_BASE+'/api/tables',{
+      headers:{'X-API-Key':API_KEY}
+    });
+    
+    console.log('Response status:', res.status, res.statusText);
+    
     if(!res.ok) throw new Error('HTTP '+res.status);
+    
     const tables = await res.json();
+    console.log('Tables response:', tables);
+    
     if(!Array.isArray(tables)||!tables.length){
+      console.log('No tables found in response');
       grid.innerHTML='<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1;text-align:center;">No tables configured. Ask staff.</div>';
       return;
     }
+    
     grid.innerHTML = tables.map(t=>`
       <button class="tbl-btn" data-id="${esc(t.id)}" data-name="${esc(t.name)}" data-num="${t.table_num||0}" onclick="selectTable(this)">${esc(t.name)}</button>
     `).join('');
-    console.log('Loaded', tables.length, 'tables from API');
+    console.log('Successfully loaded', tables.length, 'tables from API');
   }catch(e){
     console.error('Failed to load tables from API:', e);
+    console.error('Error details:', e.message);
+    console.log('API_BASE:', API_BASE);
     console.log('Using fallback numbered tables');
+    
     // Fallback: numbered grid 1-20 (ensures the system always works)
     grid.innerHTML = Array.from({length:20},(_,i)=>`
       <button class="tbl-btn" data-id="t${i+1}" data-name="${i+1}" data-num="${i+1}" onclick="selectTable(this)">${i+1}</button>
     `).join('');
-    toast('Using offline table selection', 3000);
+    toast('Using offline table selection - Check console for errors', 5000);
   }
 }
 
