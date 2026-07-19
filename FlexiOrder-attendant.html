@@ -765,27 +765,27 @@ th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.08em;
 </style>
 </head>
 <body>
-<div class="wrap">
+  <div class="wrap">
     <h1>FlexiOrder</h1>
     <div class="sub">Makindye · Kampala</div>
-  <div class="meta">
+    <div class="meta">
       <div><strong>Receipt:</strong> #${escapeHtml(order.id)}</div>
       <div><strong>Table:</strong> ${escapeHtml(order.table_name || '—')}</div>
       <div><strong>Customer:</strong> ${escapeHtml(order.customer || 'Guest')}</div>
       ${order.payment_method ? `<div><strong>Payment:</strong> ${escapeHtml(order.payment_method)}</div>` : ''}
       ${order.payment_contact ? `<div><strong>Payment Contact:</strong> ${escapeHtml(order.payment_contact)}</div>` : ''}
       <div><strong>Status:</strong> ${escapeHtml(order.status || 'pending')}</div>
-    <div><strong>Time:</strong> ${escapeHtml(createdAt)}</div>
-  </div>
-  <table>
+      <div><strong>Time:</strong> ${escapeHtml(createdAt)}</div>
+    </div>
+    <table>
       <thead>
         <tr><th>Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Amount</th></tr>
       </thead>
-    <tbody>${itemsHtml}</tbody>
-  </table>
+      <tbody>${itemsHtml}</tbody>
+    </table>
     <div class="total">Total: UGX ${(order.total || 0).toLocaleString()}</div>
     ${order.note ? `<div class="note"><strong>Note:</strong> ${escapeHtml(order.note)}</div>` : ''}
-</div>
+  </div>
 </body>
 </html>`);
   receiptWindow.document.close();
@@ -855,11 +855,11 @@ function changePassword(){
   if(cur!==getPassword()){document.getElementById('curPw').classList.add('err');showMsg('pwMsg','✕ Current password wrong.','err');return;}
   if(nw.length<6){document.getElementById('newPw').classList.add('err');showMsg('pwMsg','✕ Min 6 characters.','err');return;}
   if(nw!==conf){document.getElementById('confPw').classList.add('err');showMsg('pwMsg','✕ Passwords do not match.','err');return;}
-      savePassword(nw);
-      ['curPw','newPw','confPw'].forEach(id=>document.getElementById(id).value='');
-      document.getElementById('pwStrength').style.display='none';
-      showMsg('pwMsg','✓ Password updated!','ok');
-      notify('Password Changed','New password saved.','ok');
+  savePassword(nw);
+  ['curPw','newPw','confPw'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pwStrength').style.display='none';
+  showMsg('pwMsg','✓ Password updated!','ok');
+  notify('Password Changed','New password saved.','ok');
 }
 function onNewPw(){
   clearPwUi();
