@@ -403,6 +403,44 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           </div>
         </div>
 
+        <!-- Payment Integration -->
+        <div class="scard">
+          <div class="scard-hdr"><span class="scard-icon">💳</span>
+            <div><div class="scard-title">Payment Integration</div>
+            <div class="scard-sub">Configure payment methods and integration settings for your venue.</div></div>
+          </div>
+          <div class="scard-body">
+            <div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-radius:4px;padding:12px;margin-bottom:14px;">
+              <div style="font-size:.75rem;font-weight:700;color:var(--cyan);margin-bottom:8px;">📋 PAYMENT INTEGRATION DIRECTIVES</div>
+              <div style="font-size:.68rem;color:var(--muted);line-height:1.6;">
+                <strong>1. Mobile Money Integration:</strong><br>
+                • Add your MTN/airtel merchant account details below<br>
+                • Configure callback URLs for payment notifications<br>
+                • Set up automatic payment confirmation polling<br><br>
+                <strong>2. Card Payment Integration:</strong><br>
+                • Add your payment gateway API keys (Stripe, PayPal, etc.)<br>
+                • Configure webhook endpoints for real-time updates<br>
+                • Set up currency conversion rates if needed<br><br>
+                <strong>3. Integration Steps:</strong><br>
+                • Fill in the payment provider credentials below<br>
+                • Test payment flow in sandbox mode first<br>
+                • Enable live payments after successful testing<br>
+                • Monitor transaction logs in the Records tab
+              </div>
+            </div>
+            <div class="sf-row"><label class="sf-label">MTN Mobile Money Merchant ID</label><input class="sf-input" type="text" id="mtnMerchantId" placeholder="Enter MTN merchant ID"/></div>
+            <div class="sf-row"><label class="sf-label">MTN API Key</label><input class="sf-input" type="password" id="mtnApiKey" placeholder="Enter MTN API key"/></div>
+            <div class="sf-row"><label class="sf-label">Airtel Money Merchant ID</label><input class="sf-input" type="text" id="airtelMerchantId" placeholder="Enter Airtel merchant ID"/></div>
+            <div class="sf-row"><label class="sf-label">Airtel API Key</label><input class="sf-input" type="password" id="airtelApiKey" placeholder="Enter Airtel API key"/></div>
+            <div class="sf-row"><label class="sf-label">Stripe Publishable Key</label><input class="sf-input" type="password" id="stripeKey" placeholder="pk_live_..."/></div>
+            <div class="sf-row"><label class="sf-label">Stripe Secret Key</label><input class="sf-input" type="password" id="stripeSecret" placeholder="sk_live_..."/></div>
+            <div class="sf-row"><label class="sf-label">PayPal Client ID</label><input class="sf-input" type="text" id="paypalClientId" placeholder="PayPal client ID"/></div>
+            <div class="sf-row"><label class="sf-label">PayPal Secret</label><input class="sf-input" type="password" id="paypalSecret" placeholder="PayPal secret"/></div>
+            <button class="sf-btn" onclick="savePaymentSettings()"><span>Save Payment Settings →</span></button>
+            <div class="sf-msg" id="paymentMsg"></div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -704,6 +742,7 @@ function renderSettingsData(){
   if(cur) cur.textContent = getApiUrl();
   fetchVenueSettings();
   fetchTablesForManager();
+  fetchPaymentSettings();
 }
 
 // ════════════════════════════════════════
@@ -785,6 +824,55 @@ async function saveVenueSettings(){
   }catch(e){
     showMsg('venueMsg', 'Network error saving venue settings.', 'err');
   }
+}
+
+// ════════════════════════════════════════
+// PAYMENT SETTINGS
+// ════════════════════════════════════════
+function fetchPaymentSettings(){
+  try{
+    const savedConfig = JSON.parse(localStorage.getItem('flexiorder_payment_config') || '{}');
+    if(savedConfig.mtn_merchant_id) document.getElementById('mtnMerchantId').value = savedConfig.mtn_merchant_id;
+    if(savedConfig.mtn_api_key) document.getElementById('mtnApiKey').value = savedConfig.mtn_api_key;
+    if(savedConfig.airtel_merchant_id) document.getElementById('airtelMerchantId').value = savedConfig.airtel_merchant_id;
+    if(savedConfig.airtel_api_key) document.getElementById('airtelApiKey').value = savedConfig.airtel_api_key;
+    if(savedConfig.stripe_key) document.getElementById('stripeKey').value = savedConfig.stripe_key;
+    if(savedConfig.stripe_secret) document.getElementById('stripeSecret').value = savedConfig.stripe_secret;
+    if(savedConfig.paypal_client_id) document.getElementById('paypalClientId').value = savedConfig.paypal_client_id;
+    if(savedConfig.paypal_secret) document.getElementById('paypalSecret').value = savedConfig.paypal_secret;
+  }catch(e){
+    console.error('Error loading payment settings:', e);
+  }
+}
+
+async function savePaymentSettings(){
+  const paymentConfig = {
+    mtn_merchant_id: document.getElementById('mtnMerchantId').value.trim(),
+    mtn_api_key: document.getElementById('mtnApiKey').value.trim(),
+    airtel_merchant_id: document.getElementById('airtelMerchantId').value.trim(),
+    airtel_api_key: document.getElementById('airtelApiKey').value.trim(),
+    stripe_key: document.getElementById('stripeKey').value.trim(),
+    stripe_secret: document.getElementById('stripeSecret').value.trim(),
+    paypal_client_id: document.getElementById('paypalClientId').value.trim(),
+    paypal_secret: document.getElementById('paypalSecret').value.trim()
+  };
+  
+  // Store in localStorage for now (in production, this should go to a secure server endpoint)
+  localStorage.setItem('flexiorder_payment_config', JSON.stringify(paymentConfig));
+  showMsg('paymentMsg', 'Payment settings saved locally. In production, these should be stored securely on your server.', 'ok');
+  
+  // You can extend this to save to your backend API
+  // Example:
+  // try{
+  //   const res = await fetch(getApiUrl()+'/api/payment-settings', {
+  //     method:'POST',
+  //     headers:{'Content-Type':'application/json','X-API-Key':API_KEY},
+  //     body: JSON.stringify(paymentConfig)
+  //   });
+  //   if(res.ok) showMsg('paymentMsg', 'Payment settings saved securely.', 'ok');
+  // }catch(e){
+  //   showMsg('paymentMsg', 'Network error saving payment settings.', 'err');
+  // }
 }
 
 // ════════════════════════════════════════
