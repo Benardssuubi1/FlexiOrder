@@ -1165,42 +1165,53 @@ function goHome(){
 // ═══════════════════════════════════════
 // MENU
 // ═══════════════════════════════════════
-function renderTabs(){
-  document.getElementById('catTabs').innerHTML = Object.entries(MENU).map(([k,v])=>
-    `<button class="ctab${k===activeCat?' on':''}" onclick="setCategory('${k}')">${v.emoji} ${v.label}</button>`
-  ).join('');
-}
-function setCategory(key){ activeCat=key; renderTabs(); renderMenu(); }
 
-function renderMenu(){
-  const grid = document.getElementById('menuGrid');
-  if(!grid) return;
-
-  // Safely extract the items array whether API returned an Array or Object
-  const rawList = Array.isArray(menuItems) ? menuItems : (menuItems?.items || []);
-
-  const selectedCat = typeof activeCat !== 'undefined' ? activeCat : (typeof activeCategory !== 'undefined' ? activeCategory : 'All');
-
-  const filtered = selectedCat === 'All' 
-    ? rawList 
-    : rawList.filter(i => (i.category || i.cat) === selectedCat);
-
-  if(!filtered.length){
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">No items found.</div>';
-    return;
-  }
-
-  grid.innerHTML = filtered.map(item => `
-    <div class="menu-card">
-      <div class="menu-emoji">${item.emoji || '🍽️'}</div>
-      <div class="menu-info">
-        <h3>${esc(item.name || 'Unnamed Item')}</h3>
-        <p class="price">UGX ${(item.price || 0).toLocaleString()}</p>
-      </div>
-      <button onclick="addToCart('${esc(item.id || item.name)}')">Add</button>
-    </div>
+function buildCategoryTabs(){
+  const cats = ['All',...new Set(menuItems.map(i=>i.category).filter(Boolean))];
+  const tabs = document.getElementById('catTabs');
+  tabs.innerHTML = cats.map(c=>`
+    <button class="ctab${c===activeCategory?' on':''}" onclick="setCategory('${esc(c)}',this)">${esc(c)}</button>
   `).join('');
 }
+
+function setCategory(cat,btn){
+  activeCategory=cat;
+  document.querySelectorAll('.ctab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderMenu();
+}
+
+function renderMenu(){
+  const filtered = activeCategory==='All' ? menuItems : menuItems.filter(i=>i.category===activeCategory);
+  const grid = document.getElementById('menuGrid');
+  if(!filtered.length){
+    grid.innerHTML='<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">No items in this category.</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(item=>{
+    const inCart = cart[item.id];
+    const qty = inCart ? inCart.qty : 0;
+    return `<div class="mcard${qty>0?' in-cart':''}" id="mc-${esc(item.id)}">
+      <div class="mc-left">
+        <span class="mc-emoji">${esc(item.emoji||'🍹')}</span>
+        <div class="mc-name">${esc(item.name)}</div>
+        <div class="mc-desc">${esc(item.description||'')}</div>
+      </div>
+      <div class="mc-right">
+        <div class="mc-price">UGX ${Number(item.price||0).toLocaleString()}</div>
+        ${qty>0
+          ? `<div class="qty-wrap">
+               <button class="qb" onclick="changeQty('${esc(item.id)}',-1)">−</button>
+               <span class="qn">${qty}</span>
+               <button class="qb" onclick="changeQty('${esc(item.id)}',1)">+</button>
+             </div>`
+          : `<button class="add-btn" onclick="addToCart('${esc(item.id)}')">+</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+   
 // ═══════════════════════════════════════
 // CART
 // ═══════════════════════════════════════
