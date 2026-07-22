@@ -1136,15 +1136,24 @@ function selectTable(btn){
   cb.classList.add('ready');
 }
 
-function confirmTable(e){
-  if(!selectedTable){ e.preventDefault(); return false; }
-  document.getElementById('tablePage').classList.remove('show');
-  document.getElementById('sitePage').classList.add('show');
-  document.getElementById('ribbonText').textContent = 'Ordering for Table '+selectedTable.name;
-  document.getElementById('drawerTableTag').textContent = 'Table '+selectedTable.name;
-  document.getElementById('custName').value = selectedTable.name;
-  loadMenu();
-  return false;
+// 1. Hide the table picker page and show the main site
+document.getElementById('tablePage').classList.remove('show');
+document.getElementById('sitePage').classList.add('show');
+
+// 2. Set the table name in the ribbon header
+const ribbonTable = document.getElementById('ribbonTableText');
+if (ribbonTable && selectedTable) {
+  ribbonTable.textContent = selectedTable.name;
+}
+
+// 3. Load the menu data and jump straight to the menu section
+loadMenu();
+window.location.hash = '#menu';
+
+// If your menu section has a specific element ID (like 'menuSec' or 'menu'), scroll it into view smoothly:
+const menuEl = document.getElementById('menuSec') || document.getElementById('menu');
+if (menuEl) {
+  menuEl.scrollIntoView({ behavior: 'smooth' });
 }
 
 function goHome(){
