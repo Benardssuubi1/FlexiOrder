@@ -1167,66 +1167,89 @@ function goHome(){
 // ═══════════════════════════════════════
 async function loadMenu(){
   const grid = document.getElementById('menuGrid');
+  if(!grid) return;
+  
   grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">Loading menu…</div>';
+  
   try{
-    const res = await fetch(API_BASE+'/api/menu');
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    menuItems = await res.json();
+    const res = await fetch(API_BASE + '/api/menu');
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    
+    const data = await res.json();
+    
+    // 🛡️ SAFE UNPACKING: Works if API returns [...] OR { items: [...] } OR { data: [...] }
+    menuItems = Array.isArray(data) ? data : (data.items || data.data || []);
+    
   }catch(e){
     console.error('✗ Failed to load menu:', e);
     grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">Could not load menu. Please refresh.</div>';
     return;
   }
+  
   buildCategoryTabs();
   renderMenu();
 }
 
 function buildCategoryTabs(){
-  const cats = ['All', ...new Set(menuItems.map(i=>i.category).filter(Boolean))];
+  // 🛡️ Ensure menuItems is an array before mapping
+  const items = Array.isArray(menuItems) ? menuItems : [];
+  const cats = ['All', ...new Set(items.map(i => i.category || i.cat).filter(Boolean))];
+  
   const tabs = document.getElementById('catTabs');
-  tabs.innerHTML = cats.map(c=>`
+  if(!tabs) return;
+
+  tabs.innerHTML = cats.map(c => `
     <button class="ctab${c === activeCategory ? ' on' : ''}" onclick="setCategory('${esc(c)}',this)">${esc(c)}</button>
   `).join('');
 }
-   
-function setCategory(cat,btn){
-  activeCategory=cat;
-  document.querySelectorAll('.ctab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
+    
+function setCategory(cat, btn){
+  activeCategory = cat;
+  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
   renderMenu();
 }
 
 function renderMenu(){
-  const filtered = activeCategory==='All' ? menuItems : menuItems.filter(i=>i.category===activeCategory);
   const grid = document.getElementById('menuGrid');
+  if(!grid) return;
+
+  // 🛡️ Ensure menuItems is an array
+  const items = Array.isArray(menuItems) ? menuItems : [];
+  const filtered = activeCategory === 'All' 
+    ? items 
+    : items.filter(i => (i.category || i.cat) === activeCategory);
+
   if(!filtered.length){
-    grid.innerHTML='<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">No items in this category.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">No items in this category.</div>';
     return;
   }
-  grid.innerHTML = filtered.map(item=>{
-    const inCart = cart[item.id];
+
+  grid.innerHTML = filtered.map(item => {
+    const itemId = item.id || item.name;
+    const inCart = cart[itemId];
     const qty = inCart ? inCart.qty : 0;
-    return `<div class="mcard${qty>0?' in-cart':''}" id="mc-${esc(item.id)}">
+    
+    return `<div class="mcard${qty > 0 ? ' in-cart' : ''}" id="mc-${esc(itemId)}">
       <div class="mc-left">
-        <span class="mc-emoji">${esc(item.emoji||'🍹')}</span>
-        <div class="mc-name">${esc(item.name)}</div>
-        <div class="mc-desc">${esc(item.description||'')}</div>
+        <span class="mc-emoji">${esc(item.emoji || '🍹')}</span>
+        <div class="mc-name">${esc(item.name || 'Unnamed Item')}</div>
+        <div class="mc-desc">${esc(item.description || item.desc || '')}</div>
       </div>
       <div class="mc-right">
-        <div class="mc-price">UGX ${Number(item.price||0).toLocaleString()}</div>
-        ${qty>0
+        <div class="mc-price">UGX ${Number(item.price || 0).toLocaleString()}</div>
+        ${qty > 0
           ? `<div class="qty-wrap">
-               <button class="qb" onclick="changeQty('${esc(item.id)}',-1)">−</button>
+               <button class="qb" onclick="changeQty('${esc(itemId)}',-1)">−</button>
                <span class="qn">${qty}</span>
-               <button class="qb" onclick="changeQty('${esc(item.id)}',1)">+</button>
+               <button class="qb" onclick="changeQty('${esc(itemId)}',1)">+</button>
              </div>`
-          : `<button class="add-btn" onclick="addToCart('${esc(item.id)}')">+</button>`
+          : `<button class="add-btn" onclick="addToCart('${esc(itemId)}')">+</button>`
         }
       </div>
     </div>`;
   }).join('');
 }
-
 // ═══════════════════════════════════════
 // CART
 // ═══════════════════════════════════════
