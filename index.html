@@ -1172,13 +1172,13 @@ async function loadMenu(){
 }
 
 function buildCategoryTabs(){
-  const cats = ['All',...new Set(menuItems.map(i=>i.category).filter(Boolean))];
+  const cats = ['All', ...new Set(menuItems.map(i=>i.category).filter(Boolean))];
   const tabs = document.getElementById('catTabs');
   tabs.innerHTML = cats.map(c=>`
-    <button class="ctab${c===activeCategory?' on':''}" onclick="setCategory('${esc(c)}',this)">${esc(c)}</button>
+    <button class="ctab${c === activeCategory ? ' on' : ''}" onclick="setCategory('${esc(c)}',this)">${esc(c)}</button>
   `).join('');
 }
-
+   
 function setCategory(cat,btn){
   activeCategory=cat;
   document.querySelectorAll('.ctab').forEach(b=>b.classList.remove('on'));
