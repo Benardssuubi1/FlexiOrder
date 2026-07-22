@@ -1165,7 +1165,22 @@ function goHome(){
 // ═══════════════════════════════════════
 // MENU
 // ═══════════════════════════════════════
-
+async function loadMenu(){
+  const grid = document.getElementById('menuGrid');
+  if(!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">Loading menu…</div>';
+  try{
+    const res = await fetch(API_BASE + '/api/menu');
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    menuItems = await res.json();
+  }catch(e){
+    console.error('✗ Failed to load menu:', e);
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">Could not load menu. Please refresh.</div>';
+    return;
+  }
+  buildCategoryTabs();
+  renderMenu();
+}
 function buildCategoryTabs(){
   const cats = ['All',...new Set(menuItems.map(i=>i.category).filter(Boolean))];
   const tabs = document.getElementById('catTabs');
