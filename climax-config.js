@@ -6,7 +6,7 @@
   
   window.CLIMAX_CONFIG = {
     // Your Render cloud API URL - update this to your actual Render URL
-    API_BASE: 'https://flexiorder-api.onrender.com',
+    API_URL: 'https://flexiorder-api.onrender.com',
     
     // Your API secret key - must match API_SECRET_KEY in your Render environment variables
     API_KEY: '@6Foodies',
