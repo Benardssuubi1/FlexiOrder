@@ -1660,28 +1660,33 @@ function renderTabs(){
 function setCategory(key){ activeCat=key; renderTabs(); renderMenu(); }
 
 function renderMenu(){
-  const cat = MENU[activeCat];
-  document.getElementById('menuGrid').innerHTML = cat.items.map(item => {
-    const qty = cart[item.id]?.qty || 0;
-    return `<div class="mcard${qty>0?' in-cart':''}" id="card-${item.id}">
-      <div class="card-badge" id="badge-${item.id}" style="display:${qty>0?'flex':'none'}">${qty}</div>
-      <div class="mc-left">
-        <span class="mc-emoji">${item.emoji}</span>
-        <div class="mc-name">${item.name}</div>
-        <div class="mc-desc">${item.desc}</div>
+  const grid = document.getElementById('menuGrid');
+  if(!grid) return;
+
+  // Safely extract the items array whether API returned an Array or Object
+  const rawList = Array.isArray(menuItems) ? menuItems : (menuItems?.items || []);
+
+  const selectedCat = typeof activeCat !== 'undefined' ? activeCat : (typeof activeCategory !== 'undefined' ? activeCategory : 'All');
+
+  const filtered = selectedCat === 'All' 
+    ? rawList 
+    : rawList.filter(i => (i.category || i.cat) === selectedCat);
+
+  if(!filtered.length){
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">No items found.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => `
+    <div class="menu-card">
+      <div class="menu-emoji">${item.emoji || '🍽️'}</div>
+      <div class="menu-info">
+        <h3>${esc(item.name || 'Unnamed Item')}</h3>
+        <p class="price">UGX ${(item.price || 0).toLocaleString()}</p>
       </div>
-      <div class="mc-right">
-        <div class="mc-price">UGX ${item.price.toLocaleString()}</div>
-        <div class="qty-wrap" id="ctrl-${item.id}">
-          ${qty===0
-            ?`<button class="add-btn" onclick="addItem('${item.id}',event)">+</button>`
-            :`<button class="qb" onclick="chg('${item.id}',-1,event)">−</button>
-              <span class="qn">${qty}</span>
-              <button class="qb" onclick="chg('${item.id}',1,event)">+</button>`}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+      <button onclick="addToCart('${esc(item.id || item.name)}')">Add</button>
+    </div>
+  `).join('');
 }
 
 // ═══════════════════════════════════════
