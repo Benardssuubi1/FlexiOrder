@@ -1161,10 +1161,15 @@ async function loadMenu(){
   const grid = document.getElementById('menuGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">Loading menu…</div>';
   try{
-    const res = await fetch(API_BASE+'/api/menu');
+    const res = await fetch(API_BASE+'/api/menu', {
+      headers: {
+        'X-API-Key': API_KEY
+      }
+    });
     if(!res.ok) throw new Error('HTTP '+res.status);
     menuItems = await res.json();
   }catch(e){
+    console.error('✗ Failed to load menu:', e);
     grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">Could not load menu. Please refresh.</div>';
     return;
   }
@@ -1384,7 +1389,10 @@ async function submitOrder(){
   try{
     const res = await fetch(API_BASE+'/api/orders',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'X-API-Key': API_KEY
+      },
       body: JSON.stringify({
         table_name: selectedTable.name,
         table_num:  selectedTable.table_num,
@@ -1406,7 +1414,6 @@ async function submitOrder(){
     btn.disabled=false; btn.textContent='Send Order to Bar →';
   }
 }
-
 function showSuccess(ref, payMethod, payContact){
   closeDrawer();
   document.getElementById('sRef').textContent = '#'+ref;
