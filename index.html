@@ -1103,6 +1103,39 @@ function checkGeofence(){
 }
 
 // ═══════════════════════════════════════
+// VENUE THEME — Apply venue name & settings
+// ═══════════════════════════════════════
+function applyVenueTheme(v){
+    if(!v) return;
+    
+    if(v.name){
+        const venueName = v.name.toUpperCase();
+        
+        // Update all logos
+        document.querySelectorAll('.tp-logo, .nav-logo, .f-logo').forEach(el => {
+            el.textContent = venueName;
+        });
+        
+        // Update hero heading - replace the big FLEXI ORDER text
+        const heroW1 = document.querySelector('.hero-h1 .w1');
+        const heroW2 = document.querySelector('.hero-h1 .w2');
+        if(heroW1 && heroW2){
+            heroW1.textContent = venueName;
+            heroW2.textContent = ''; // Clear the second line
+        }
+        
+        // Update page title
+        document.title = v.name + ' — Smart Bar Service';
+        
+        console.log('✓ Venue name applied:', venueName);
+    }
+    
+    if(v.theme_color){
+        document.documentElement.style.setProperty('--lime', v.theme_color);
+    }
+}
+
+// ═══════════════════════════════════════
 // TABLE PICKER WITH GEOFENCING
 // ═══════════════════════════════════════
 async function loadVenueAndTables(){
@@ -1116,6 +1149,8 @@ async function loadVenueAndTables(){
         ]);
         
         venueInfo = venueRes.ok ? await venueRes.json() : null;
+        applyVenueTheme(venueInfo); // Apply venue theme immediately
+        
         const tables = tablesRes.ok ? await tablesRes.json() : null;
         
         if(tables && Array.isArray(tables) && tables.length){
@@ -1377,7 +1412,7 @@ function onPayChange(){
 }
 
 // ═══════════════════════════════════════
-// SUBMIT ORDER
+// SUBMIT ORDER — FIXED
 // ═══════════════════════════════════════
 async function submitOrder(){
     const items = Object.values(cart);
@@ -1415,12 +1450,16 @@ async function submitOrder(){
         });
         
         const data = await res.json();
-        if(!res.ok) throw new Error(data.error||'Server error');
         
-        showSuccess(data.id, payMethod, payContact);
+        // Handle both success formats: {success: true, id: "xxx"} or just {id: "xxx"}
+        if(res.ok && (data.success || data.id)){
+            showSuccess(data.id, payMethod, payContact);
+        } else {
+            throw new Error(data.error || 'Server error');
+        }
     }catch(e){
+        console.error('Order submission error:', e);
         toast('Order failed: '+e.message);
-    } finally {
         btn.disabled=false;
         btn.textContent='Send Order to Bar →';
     }
@@ -1507,7 +1546,7 @@ function initFadeUp(){
 }
 
 // ═══════════════════════════════════════
-// BOOT
+// BOOT — FIXED: Wait for DOM to be ready
 // ═══════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
     console.log('=== Page Loaded ===');
