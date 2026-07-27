@@ -39,9 +39,6 @@
   --glow-l: 0 0 20px rgba(168,255,62,.35), 0 0 60px rgba(168,255,62,.12);
 }
 
-/* ═══════════════════════════
-   RESET
-═══════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{
@@ -55,9 +52,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
 ::-webkit-scrollbar-track{background:var(--void2);}
 ::-webkit-scrollbar-thumb{background:var(--cyan);border-radius:2px;}
 
-/* ═══════════════════════════
-   BACKGROUND ATMOSPHERE
-═══════════════════════════ */
 .atmo{
   position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
@@ -77,15 +71,9 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
   );
 }
 
-/* ═══════════════════════════
-   PAGE SYSTEM
-═══════════════════════════ */
 .page{display:none;min-height:100vh;}
 .page.show{display:block;}
 
-/* ═══════════════════════════
-   TABLE PICKER PAGE
-═══════════════════════════ */
 #tablePage{
   min-height:100vh;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -105,7 +93,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
 }
 #tablePage>*:not(.tp-bg){position:relative;z-index:1;}
 
-/* Neon logo on picker */
 .tp-logo{
   font-family:'Black Ops One',sans-serif;
   font-size:2.4rem;letter-spacing:.12em;
@@ -134,7 +121,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
   text-align:center;line-height:1.65;max-width:340px;font-weight:300;
 }
 
-/* Table grid */
 .table-grid{
   display:grid;grid-template-columns:repeat(5,1fr);
   gap:10px;max-width:400px;width:100%;margin-bottom:28px;
@@ -160,7 +146,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
   box-shadow:var(--glow-c);font-weight:700;
 }
 
-/* Confirm button */
 .tp-confirm{
   padding:15px 40px;border-radius:4px;
   background:transparent;
@@ -184,12 +169,8 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
 
 .tp-note{font-size:.62rem;color:var(--muted2);margin-top:18px;text-align:center;letter-spacing:.04em;}
 
-/* ═══════════════════════════
-   SITE PAGE
-═══════════════════════════ */
 #sitePage{}
 
-/* Table ribbon */
 .table-ribbon{
   background:linear-gradient(90deg,var(--cyan),var(--lime));
   color:var(--void);
@@ -205,7 +186,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
 }
 .ribbon-change:hover{background:rgba(2,8,16,.45);}
 
-/* NAV */
 .nav{
   position:sticky;top:0;z-index:100;
   display:flex;align-items:center;justify-content:space-between;
@@ -248,7 +228,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
 .nav-ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
 .nav-ham span{display:block;width:22px;height:2px;background:var(--cyan);border-radius:1px;transition:all .3s;}
 
-/* Mobile menu */
 .mob-menu{
   position:fixed;inset:0;z-index:99;
   background:rgba(2,8,16,.97);backdrop-filter:blur(20px);
@@ -259,9 +238,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
 .mob-menu.open{transform:translateX(0);}
 .mob-close{position:absolute;top:22px;right:22px;font-size:1.4rem;color:var(--muted);cursor:pointer;}
 
-/* ═══════════════════════════
-   HERO
-═══════════════════════════ */
 .hero{
   position:relative;min-height:94vh;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -279,7 +255,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
     linear-gradient(to bottom,rgba(2,8,16,.4) 0%,rgba(2,8,16,.25) 40%,rgba(2,8,16,.7) 100%),
     radial-gradient(ellipse 80% 60% at 50% 40%,rgba(0,255,229,.06),transparent 65%);
 }
-/* Neon grid overlay */
 .hero-grid{
   position:absolute;inset:0;z-index:1;pointer-events:none;
   background-image:
@@ -324,7 +299,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
   color:rgba(232,248,255,.6);margin-bottom:48px;
 }
 
-/* Neon badge */
 .neon-badge{
   display:inline-flex;align-items:center;gap:8px;
   padding:9px 20px;border-radius:4px;margin-bottom:36px;
@@ -360,9 +334,6 @@ button{font-family:'Exo 2',sans-serif;cursor:pointer;}
 .btn-neon-p:hover::before{transform:translateX(0);}
 .btn-neon-p:hover{color:var(--void);box-shadow:var(--glow-p);}
 
-/* ═══════════════════════════
-   SECTIONS
-═══════════════════════════ */
 section{position:relative;z-index:1;}
 .sec-inner{max-width:1100px;margin:0 auto;padding:0 40px;}
 
@@ -381,9 +352,6 @@ section{position:relative;z-index:1;}
 }
 .sec-sub{font-size:.84rem;color:var(--muted);max-width:420px;line-height:1.7;font-weight:300;}
 
-/* ═══════════════════════════
-   ABOUT
-═══════════════════════════ */
 .about{
   padding:90px 0;
   border-top:1px solid var(--border-c);
@@ -413,13 +381,9 @@ section{position:relative;z-index:1;}
 }
 .astat-l{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);}
 
-/* ═══════════════════════════
-   MENU
-═══════════════════════════ */
 .menu-sec{padding:100px 0;}
 .menu-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:14px;}
 
-/* Category tabs */
 .cat-tabs{display:flex;gap:0;border-bottom:1px solid var(--border-c);overflow-x:auto;scrollbar-width:none;}
 .cat-tabs::-webkit-scrollbar{display:none;}
 .ctab{
@@ -435,7 +399,6 @@ section{position:relative;z-index:1;}
   text-shadow:0 0 12px rgba(0,255,229,.5);
 }
 
-/* Menu grid */
 .menu-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
   gap:1px;background:var(--border-c);
@@ -490,9 +453,6 @@ section{position:relative;z-index:1;}
   box-shadow:0 0 8px rgba(255,45,120,.5);
 }
 
-/* ═══════════════════════════
-   SCHEDULE
-═══════════════════════════ */
 .sched-sec{
   padding:100px 0;
   background:var(--void2);
@@ -530,9 +490,6 @@ section{position:relative;z-index:1;}
 }
 .sevent strong{color:var(--lime);font-weight:700;}
 
-/* ═══════════════════════════
-   FLOATING CART
-═══════════════════════════ */
 .cart-float{
   position:fixed;bottom:26px;right:26px;z-index:80;
   width:54px;height:54px;border-radius:6px;
@@ -571,9 +528,6 @@ section{position:relative;z-index:1;}
   font-family:'Share Tech Mono',monospace;color:var(--lime);
 }
 
-/* ═══════════════════════════
-   ORDER DRAWER
-═══════════════════════════ */
 .drawer-bg{
   position:fixed;inset:0;z-index:110;
   background:rgba(2,8,16,.8);backdrop-filter:blur(8px);
@@ -590,7 +544,6 @@ section{position:relative;z-index:1;}
 }
 .drawer.open{transform:translateX(0);}
 
-/* Drawer header */
 .d-hdr{
   padding:24px 22px 18px;
   border-bottom:1px solid var(--border-c);
@@ -626,7 +579,6 @@ section{position:relative;z-index:1;}
 .dr-name{font-size:.8rem;font-weight:600;margin-bottom:2px;}
 .dr-price{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--lime);}
 
-/* Order form */
 .d-form{padding:18px 22px;border-top:1px solid var(--border-c);flex-shrink:0;overflow-y:auto;max-height:55vh;}
 .f-row{margin-bottom:12px;}
 .f-lbl{font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;}
@@ -687,9 +639,6 @@ section{position:relative;z-index:1;}
 .send-btn:hover{transform:translateY(-2px);box-shadow:0 4px 30px rgba(255,45,120,.5);}
 .send-btn:disabled{opacity:.3;cursor:default;transform:none;box-shadow:none;}
 
-/* ═══════════════════════════
-   SUCCESS
-═══════════════════════════ */
 .success-screen{
   display:none;position:fixed;inset:0;z-index:120;
   background:rgba(2,8,16,.97);backdrop-filter:blur(16px);
@@ -729,9 +678,6 @@ section{position:relative;z-index:1;}
 .s-receipt-body{font-size:.74rem;color:var(--muted);line-height:1.5;margin-bottom:10px;}
 .s-receipt .send-btn{padding:10px 12px;font-size:.68rem;letter-spacing:.14em;}
 
-/* ═══════════════════════════
-   FOOTER
-═══════════════════════════ */
 .footer{
   padding:56px 0 36px;
   border-top:1px solid var(--border-c);text-align:center;
@@ -752,9 +698,6 @@ section{position:relative;z-index:1;}
 .f-link:hover{color:var(--cyan);}
 .f-copy{font-size:.6rem;color:var(--muted2);}
 
-/* ═══════════════════════════
-   TOAST
-═══════════════════════════ */
 .toast{
   position:fixed;bottom:96px;left:50%;transform:translateX(-50%);
   background:var(--void3);border:1px solid var(--border-c);border-left:3px solid var(--cyan);
@@ -762,12 +705,10 @@ section{position:relative;z-index:1;}
   font-family:'Share Tech Mono',monospace;letter-spacing:.06em;
   opacity:0;transition:opacity .28s;z-index:200;white-space:nowrap;pointer-events:none;
   box-shadow:0 0 20px rgba(0,255,229,.12);
+  max-width:90vw;white-space:normal;text-align:center;
 }
 .toast.show{opacity:1;}
 
-/* ═══════════════════════════
-   ANIMATIONS
-═══════════════════════════ */
 .fade-up{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
 .fade-up.in{opacity:1;transform:none;}
 .neon-flicker{animation:flicker 8s infinite;}
@@ -776,9 +717,6 @@ section{position:relative;z-index:1;}
   96%,98%{opacity:.7;}
 }
 
-/* ═══════════════════════════
-   RESPONSIVE
-═══════════════════════════ */
 @media(max-width:900px){
   .about-grid{grid-template-columns:1fr;}
   .about-stats{grid-template-columns:repeat(4,1fr);}
@@ -799,13 +737,9 @@ section{position:relative;z-index:1;}
 </head>
 <body>
 
-<!-- Atmosphere layers -->
 <div class="atmo"></div>
 <div class="scanlines"></div>
 
-<!-- ═══════════════════════════════════
-     TABLE PICKER PAGE
-═══════════════════════════════════ -->
 <div id="tablePage" class="page show">
   <div class="tp-bg"></div>
 
@@ -824,18 +758,13 @@ section{position:relative;z-index:1;}
   <p class="tp-note">Can't find your table? Ask a staff member.</p>
 </div>
 
-<!-- ═══════════════════════════════════
-     MAIN SITE PAGE
-═══════════════════════════════════ -->
 <div id="sitePage" class="page">
 
-  <!-- Ribbon -->
   <div class="table-ribbon">
     <span id="ribbonText">Ordering for Table —</span>
     <button class="ribbon-change" onclick="goHome()">Change Table</button>
   </div>
 
-  <!-- Nav -->
   <nav class="nav">
     <div class="nav-logo neon-flicker" onclick="goHome()" title="Back to home">FLEXIORDER</div>
     <div class="nav-links">
@@ -849,7 +778,6 @@ section{position:relative;z-index:1;}
     </div>
   </nav>
 
-  <!-- Mobile menu -->
   <div class="mob-menu" id="mobMenu">
     <span class="mob-close" onclick="toggleMob()">✕</span>
     <a href="#menu" class="nav-link" onclick="toggleMob()">Menu</a>
@@ -858,7 +786,6 @@ section{position:relative;z-index:1;}
     <button class="nav-order" onclick="toggleMob();openDrawer()"><span>Order Now</span></button>
   </div>
 
-  <!-- HERO -->
   <section class="hero" id="home">
     <div class="hero-bg-img"></div>
     <div class="hero-grid"></div>
@@ -882,7 +809,6 @@ section{position:relative;z-index:1;}
     </div>
   </section>
 
-  <!-- ABOUT -->
   <section class="about" id="about">
     <div class="sec-inner">
       <div class="about-grid">
@@ -892,7 +818,6 @@ section{position:relative;z-index:1;}
           <p class="sec-sub" style="margin-bottom:16px;">
             FlexiOrder brings fast, polished drinks service to the bar — from easy ordering to waiter callouts and delivery confirmation, all in one smooth flow.
           </p>
-          
         </div>
         <div class="about-stats fade-up">
           <div class="astat"><div class="astat-n">20+</div><div class="astat-l">Cocktails</div></div>
@@ -904,7 +829,6 @@ section{position:relative;z-index:1;}
     </div>
   </section>
 
-  <!-- MENU -->
   <section class="menu-sec" id="menu">
     <div class="sec-inner">
       <div class="menu-head">
@@ -918,7 +842,6 @@ section{position:relative;z-index:1;}
     </div>
   </section>
 
-  <!-- SCHEDULE -->
   <section class="sched-sec" id="schedule">
     <div class="sec-inner">
       <div class="sec-label">What's On</div>
@@ -928,7 +851,6 @@ section{position:relative;z-index:1;}
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="f-logo neon-flicker">FLEXIORDER</div>
     <div class="f-sub"><div class="f-sub"><a href="https://flexi-order-rouge.vercel.app/">Smart Bar Service</a> · <a href="https://nexus-technologies.vercel.app/">Nexus Technologies Uganda</a> · Kampala, Uganda</div></div>
@@ -940,15 +862,13 @@ section{position:relative;z-index:1;}
     <div class="f-copy">© 2026 FlexiOrder. All rights reserved.</div>
   </footer>
 
-</div><!-- /sitePage -->
+</div>
 
-<!-- Floating cart -->
 <button class="cart-float" id="cartFloat" onclick="openDrawer()">
   🛒<div class="cf-badge" id="cfBadge"></div>
   <div class="cf-preview" id="cfPreview"></div>
 </button>
 
-<!-- Order drawer -->
 <div class="drawer-bg" id="drawerBg" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="d-hdr">
@@ -1000,7 +920,6 @@ section{position:relative;z-index:1;}
   </div>
 </div>
 
-<!-- Success -->
 <div class="success-screen" id="successScreen">
   <div class="scard">
     <div class="s-icon">🥂</div>
@@ -1023,14 +942,10 @@ section{position:relative;z-index:1;}
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script src="./climax-config.js"></script>
 <script>
-// ═══════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════
 const CFG = window.CLIMAX_CONFIG || {};
 const API_BASE = (CFG.API_URL || 'https://flexiorder-api.onrender.com').replace(/\/$/, '');
 const API_KEY  = CFG.API_KEY || '@6Foodies';
@@ -1039,29 +954,21 @@ console.log('=== FlexiOrder Configuration ===');
 console.log('API Base URL:', API_BASE);
 console.log('API Key:', API_KEY ? 'present' : 'missing');
 
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
 let selectedTable = null;
 let cart = {};
 let menuItems = [];
 let activeCategory = 'All';
 let venueInfo = null;
 
-// ═══════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════
 function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function toast(msg,ms=2800){
+function toast(msg,ms=4200){
     const t=document.getElementById('toast');
     t.textContent=msg;t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),ms);
+    clearTimeout(t._hideTimer);
+    t._hideTimer = setTimeout(()=>t.classList.remove('show'),ms);
 }
 
-// ═══════════════════════════════════════
-// GEOFENCING — Haversine distance check
-// ═══════════════════════════════════════
 function haversineMeters(lat1, lng1, lat2, lng2){
     const R = 6371000;
     const toRad = d => d * Math.PI / 180;
@@ -1102,29 +1009,23 @@ function checkGeofence(){
     });
 }
 
-// ═══════════════════════════════════════
-// VENUE THEME — Apply venue name & settings
-// ═══════════════════════════════════════
 function applyVenueTheme(v){
     if(!v) return;
     
     if(v.name){
         const venueName = v.name.toUpperCase();
         
-        // Update all logos
         document.querySelectorAll('.tp-logo, .nav-logo, .f-logo').forEach(el => {
             el.textContent = venueName;
         });
         
-        // Update hero heading - replace the big FLEXI ORDER text
         const heroW1 = document.querySelector('.hero-h1 .w1');
         const heroW2 = document.querySelector('.hero-h1 .w2');
         if(heroW1 && heroW2){
             heroW1.textContent = venueName;
-            heroW2.textContent = ''; // Clear the second line
+            heroW2.textContent = '';
         }
         
-        // Update page title
         document.title = v.name + ' — Smart Bar Service';
         
         console.log('✓ Venue name applied:', venueName);
@@ -1135,9 +1036,6 @@ function applyVenueTheme(v){
     }
 }
 
-// ═══════════════════════════════════════
-// TABLE PICKER WITH GEOFENCING
-// ═══════════════════════════════════════
 async function loadVenueAndTables(){
     const grid = document.getElementById('tableGrid');
     grid.innerHTML = '<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1;text-align:center;">Loading tables…</div>';
@@ -1149,7 +1047,7 @@ async function loadVenueAndTables(){
         ]);
         
         venueInfo = venueRes.ok ? await venueRes.json() : null;
-        applyVenueTheme(venueInfo); // Apply venue theme immediately
+        applyVenueTheme(venueInfo);
         
         const tables = tablesRes.ok ? await tablesRes.json() : null;
         
@@ -1227,9 +1125,6 @@ function goHome(){
     document.getElementById('confirmBtn').classList.remove('ready');
 }
 
-// ═══════════════════════════════════════
-// MENU
-// ═══════════════════════════════════════
 async function loadMenu(){
     const grid = document.getElementById('menuGrid');
     grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);">Loading menu…</div>';
@@ -1298,9 +1193,6 @@ function renderMenu(){
     }).join('');
 }
 
-// ═══════════════════════════════════════
-// CART
-// ═══════════════════════════════════════
 function addToCart(id){
     const item = menuItems.find(i=>i.id===id);
     if(!item) return;
@@ -1337,9 +1229,6 @@ function updateCartUI(){
     renderDrawerItems();
 }
 
-// ═══════════════════════════════════════
-// DRAWER
-// ═══════════════════════════════════════
 function openDrawer(){
     document.getElementById('drawerBg').classList.add('open');
     document.getElementById('drawer').classList.add('open');
@@ -1411,57 +1300,92 @@ function onPayChange(){
     ci.placeholder = m.contactPlaceholder||'';
 }
 
-// ═══════════════════════════════════════
-// SUBMIT ORDER — FIXED
-// ═══════════════════════════════════════
+/* ═══════════════════════════════════════
+   SUBMIT ORDER — REWRITTEN
+   Fixes:
+   1. Old code only treated the order as successful when
+      `data.success` OR `data.id` was truthy. If your backend
+      returns an id of 0, or names the field something other
+      than `id` (order_id / orderId / reference / ref), that
+      check silently failed even on a 2xx response, and the
+      user saw a bogus "Server error".
+   2. Network/CORS failures (very common when a Vercel frontend
+      calls a Render Flask API with a custom X-API-Key header —
+      the preflight OPTIONS request must be handled by the
+      backend) throw a generic TypeError with no HTTP status.
+      That's now detected and reported clearly instead of
+      "Order failed: undefined".
+   3. Full response body + status are logged to the console on
+      any failure so you can see exactly what the backend sent
+      back — open DevTools > Console next time something breaks.
+═══════════════════════════════════════ */
 async function submitOrder(){
     const items = Object.values(cart);
     if(!items.length){ toast('Add items to your cart first'); return; }
     if(!selectedTable){ toast('Please select a table first'); return; }
-    
+
     const payInput = document.querySelector('input[name="payChoice"]:checked');
     const payMethod = payInput ? payInput.value : 'cash';
     const payContact = document.getElementById('paymentContact').value.trim();
     const note = document.getElementById('custNote').value.trim();
-    
+    const tempChoice = (document.querySelector('input[name="tempChoice"]:checked')||{}).value || 'Cold';
+
     const orderItems = items.map(({item,qty})=>({
         name:item.name, emoji:item.emoji||'', price:item.price, qty, category:item.category||''
     }));
-    
+
     const total = orderItems.reduce((s,i)=>s+(i.price*i.qty),0);
     const btn = document.getElementById('sendBtn');
-    btn.disabled=true;
-    btn.textContent='Sending…';
-    
+    const originalBtnText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    const payload = {
+        table_name: selectedTable.name,
+        table_num: selectedTable.table_num,
+        customer: selectedTable.name,
+        items: orderItems,
+        total,
+        note,
+        temperature: tempChoice,
+        payment_method: payMethod,
+        payment_contact: payContact
+    };
+
+    let res, rawText, data;
+
     try{
-        const res = await fetch(API_BASE+'/api/orders',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','X-API-Key':API_KEY},
-            body: JSON.stringify({
-                table_name: selectedTable.name,
-                table_num: selectedTable.table_num,
-                customer: selectedTable.name,
-                items: orderItems,
-                total,
-                note,
-                payment_method: payMethod,
-                payment_contact: payContact
-            })
+        res = await fetch(API_BASE + '/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
+            body: JSON.stringify(payload)
         });
-        
-        const data = await res.json();
-        
-        // Handle both success formats: {success: true, id: "xxx"} or just {id: "xxx"}
-        if(res.ok && (data.success || data.id)){
-            showSuccess(data.id, payMethod, payContact);
-        } else {
-            throw new Error(data.error || 'Server error');
-        }
-    }catch(e){
-        console.error('Order submission error:', e);
-        toast('Order failed: '+e.message);
-        btn.disabled=false;
-        btn.textContent='Send Order to Bar →';
+    }catch(networkErr){
+        // fetch() itself threw — almost always CORS or DNS/network, not a bug
+        // in the order data. Surface that distinction clearly.
+        console.error('FlexiOrder: network/CORS failure calling /api/orders', networkErr);
+        toast("Couldn't reach the bar (network/CORS error). Check your connection or ask staff to check the backend.", 6000);
+        btn.disabled = false;
+        btn.textContent = originalBtnText;
+        return;
+    }
+
+    rawText = await res.text();
+    try{ data = rawText ? JSON.parse(rawText) : {}; }catch(_){ data = {}; }
+
+    console.log('FlexiOrder: /api/orders response', { status: res.status, ok: res.ok, body: rawText });
+
+    // Accept any of the common id field names, and treat 0 as a valid id.
+    const orderRef = data.id ?? data.order_id ?? data.orderId ?? data.reference ?? data.ref ?? null;
+
+    if(res.ok && (data.success === true || orderRef !== null)){
+        showSuccess(orderRef ?? '—', payMethod, payContact);
+    } else {
+        const serverMsg = data.error || data.message || rawText || ('HTTP ' + res.status);
+        console.error('FlexiOrder: order rejected by server', serverMsg);
+        toast('Order failed: ' + serverMsg, 6000);
+        btn.disabled = false;
+        btn.textContent = originalBtnText;
     }
 }
 
@@ -1480,6 +1404,11 @@ function showSuccess(ref, payMethod, payContact){
     
     window._lastOrderRef = ref;
     document.getElementById('successScreen').classList.add('show');
+
+    // Reset the send button for the next order.
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = false;
+    btn.textContent = 'Send Order to Bar →';
 }
 
 function confirmReceipt(){
@@ -1503,9 +1432,6 @@ function resetOrder(){
     document.getElementById('custNote').value='';
 }
 
-// ═══════════════════════════════════════
-// SCHEDULE
-// ═══════════════════════════════════════
 function buildSchedule(){
     const days=[
         {name:'Monday',   time:'5PM – 12AM', events:[]},
@@ -1528,16 +1454,10 @@ function buildSchedule(){
     `).join('');
 }
 
-// ═══════════════════════════════════════
-// NAV
-// ═══════════════════════════════════════
 function toggleMob(){
     document.getElementById('mobMenu').classList.toggle('open');
 }
 
-// ═══════════════════════════════════════
-// FADE-UP OBSERVER
-// ═══════════════════════════════════════
 function initFadeUp(){
     const obs = new IntersectionObserver(entries=>{
         entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
@@ -1545,9 +1465,6 @@ function initFadeUp(){
     document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
 }
 
-// ═══════════════════════════════════════
-// BOOT — FIXED: Wait for DOM to be ready
-// ═══════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
     console.log('=== Page Loaded ===');
     loadVenueAndTables();
